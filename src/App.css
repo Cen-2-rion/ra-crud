@@ -93,6 +93,19 @@ button {
   }
 }
 
+.edit-button {
+  position: absolute;
+  top: -20px;
+  right: 15px;
+  font-size: 22px;
+  color: #5160ff;
+
+  &:hover {
+    background-color: #5160ff;
+    color: #fff;
+  }
+}
+
 /* Форма добавления */
 .form {
   position: relative;

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Note } from './interfaces';
-import { getNotes, addNote, deleteNote } from './Api';
+import { getNotes, addNote, deleteNote, editNote } from './Api';
 import Notes from './components/Notes';
 import NoteForm from './components/NoteForm';
 import './App.css';
 
 const App = () => {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [updated, setUpdated] = useState<boolean>(false);
 
   // получаем список заметок из API и устанавливаем его в state
@@ -28,10 +29,23 @@ const App = () => {
     }
   }, [updated]);
 
-  // добавляем новую заметку и устанавливаем updated в true
+  // редактируем, добавляем заметку и устанавливаем updated в true
   const handleAddNote = async (content: string) => {
-    await addNote(content);
-    setUpdated(true);
+    if (editingNote) {
+      await editNote(editingNote.id, content);
+
+      // обновляем локальное состояние заметок
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === editingNote.id ? { ...note, content } : note
+        )
+      );
+      // сбрасываем состояние редактирования
+      setEditingNote(null);
+    } else {
+      await addNote(content);
+      setUpdated(true);
+    }
   }
 
   // удаляем заметку и устанавливаем updated в true
@@ -40,14 +54,19 @@ const App = () => {
     setUpdated(true);
   }
 
+  // редактируем заметку и устанавливаем editingNote в state
+  const handleEditNote = (note: Note) => {
+    setEditingNote(note);
+  }
+
   return (
     <div className='container'>
       <div className='header'>
         <h1 className='title'>Notes</h1>
         <button className='refresh-button' onClick={fetchNotes}>↻</button>
       </div>
-      <Notes notes={notes} onDelete={handleDeleteNote} />
-      <NoteForm onAdd={handleAddNote} />
+      <Notes notes={notes} onDelete={handleDeleteNote} onEdit={handleEditNote} />
+      <NoteForm onAdd={handleAddNote} editingNote={editingNote} />
     </div>
   );
 }

@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NoteFormProps } from '../interfaces';
 
-const NoteForm = ({ onAdd }: NoteFormProps) => {
+const NoteForm = ({ onAdd, editingNote }: NoteFormProps) => {
   const [content, setContent] = useState('');
+
+  useEffect(() => {
+    if (editingNote) {
+      setContent(editingNote.content); // заполняем поле при редактировании
+    }
+  }, [editingNote]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +25,7 @@ const NoteForm = ({ onAdd }: NoteFormProps) => {
 
   return (
     <form className='form' onSubmit={handleSubmit}>
-      <label htmlFor='content'>New Note</label>
+      <label htmlFor='content'>{editingNote ? 'Edit Note' : 'New Note'}</label>
       <textarea className='form-content'
         id='content'
         name='content'

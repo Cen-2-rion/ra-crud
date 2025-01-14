@@ -16,7 +16,7 @@ export const addNote = async (content: string): Promise<void> => {
   await fetch(API_URL, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json', // указываем, что данные в формате JSON
     },
     body: JSON.stringify({ id: 0, content }),
   });
@@ -26,5 +26,16 @@ export const addNote = async (content: string): Promise<void> => {
 export const deleteNote = async (id: number): Promise<void> => {
   await fetch(`${API_URL}/${id}`, {
     method: 'DELETE',
+  });
+}
+
+// редактируем заметку на сервере
+export const editNote = async (id: number, content: string): Promise<void> => {
+  await fetch(`${API_URL}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ content }),
   });
 }
