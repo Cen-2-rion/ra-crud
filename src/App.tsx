@@ -8,12 +8,16 @@ import './App.css';
 const App = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
-  const [updated, setUpdated] = useState<boolean>(false);
+  const [updated, setUpdated] = useState(false);
 
   // получаем список заметок из API и устанавливаем его в state
   const fetchNotes = async () => {
-    const data = await getNotes();
-    setNotes(data);
+    try {
+      const data = await getNotes();
+      setNotes(data);
+    } catch (error) {
+      console.error('Ошибка при загрузке заметок:', error);
+    }
   }
 
   // загружаем список заметок при старте приложения
@@ -29,29 +33,37 @@ const App = () => {
     }
   }, [updated]);
 
-  // редактируем, добавляем заметку и устанавливаем updated в true
-  const handleAddNote = async (content: string) => {
-    if (editingNote) {
-      await editNote(editingNote.id, content);
+  // добавляем (редактируем) заметку и устанавливаем updated в true
+  const handleAddEditNote = async (content: string) => {
+    try {
+      if (editingNote && editingNote.id) {
+        await editNote(editingNote.id, content);
 
-      // обновляем локальное состояние заметок
-      setNotes((prevNotes) =>
-        prevNotes.map((note) =>
-          note.id === editingNote.id ? { ...note, content } : note
-        )
-      );
-      // сбрасываем состояние редактирования
-      setEditingNote(null);
-    } else {
-      await addNote(content);
+        // обновляем локальное состояние заметок
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.id === editingNote.id ? { ...note, content } : note
+          )
+        );
+        // сбрасываем состояние редактирования
+        setEditingNote(null);
+      } else {
+        await addNote(content);
+      }
       setUpdated(true);
+    } catch (error) {
+      console.error('Ошибка при сохранении заметки:', error);
     }
   }
 
   // удаляем заметку и устанавливаем updated в true
   const handleDeleteNote = async (id: number) => {
-    await deleteNote(id);
-    setUpdated(true);
+    try {
+      await deleteNote(id);
+      setUpdated(true);
+    } catch (error) {
+      console.error('Ошибка при удалении заметки:', error);
+    }
   }
 
   // редактируем заметку и устанавливаем editingNote в state
@@ -66,7 +78,7 @@ const App = () => {
         <button className='refresh-button' onClick={fetchNotes}>↻</button>
       </div>
       <Notes notes={notes} onDelete={handleDeleteNote} onEdit={handleEditNote} />
-      <NoteForm onAdd={handleAddNote} editingNote={editingNote} />
+      <NoteForm onAdd={handleAddEditNote} editingNote={editingNote} />
     </div>
   );
 }

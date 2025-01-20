@@ -2,40 +2,63 @@ import { Note } from './interfaces';
 
 const API_URL = 'http://localhost:7070/notes';
 
-// получаем все заметки с сервера
+// получаем все заметки
 export const getNotes = async (): Promise<Note[]> => {
-  const response = await fetch(API_URL);
-  if (!response.ok) {
-    throw new Error('Ошибка!');
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(`Ошибка получения заметок: ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error(error);
+    throw error; // пробрасываем ошибку для дальнейшей обработки
   }
-  return response.json();
 }
 
-// добавляем новую заметку на сервер
+// добавляем новую заметку
 export const addNote = async (content: string): Promise<void> => {
-  await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json', // указываем, что данные в формате JSON
-    },
-    body: JSON.stringify({ id: 0, content }),
-  });
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: 0, content }),
+    });
+    if (!response.ok) {
+      throw new Error(`Ошибка добавления заметки: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-// удаляем заметку с сервера
+// удаляем заметку
 export const deleteNote = async (id: number): Promise<void> => {
-  await fetch(`${API_URL}/${id}`, {
-    method: 'DELETE',
-  });
+  try {
+    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    if (!response.ok) {
+      throw new Error(`Ошибка удаления заметки: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-// редактируем заметку на сервере
+// редактируем заметку
 export const editNote = async (id: number, content: string): Promise<void> => {
-  await fetch(`${API_URL}/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ content }),
-  });
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+    if (!response.ok) {
+      throw new Error(`Ошибка редактирования заметки: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }

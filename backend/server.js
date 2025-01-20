@@ -53,7 +53,7 @@ app.put('/notes/:id', (req, res) => {
   const noteId = Number(req.params.id);
   const index = notes.findIndex((o) => o.id === noteId);
   if (index !== -1) {
-    notes[index] = {body, id: noteId };
+    notes[index] = { ...req.body, id: noteId };
   }
   res.status(204);
   res.end();
